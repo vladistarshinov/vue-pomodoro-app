@@ -1,24 +1,34 @@
-# vue-pomodoro-app
+# Freecodecamp: Course Front End Libraries
 
-## Project setup
-```
-yarn install
-```
+Task #5: [Pomodoro Clock Project](https://www.freecodecamp.org/learn/front-end-libraries/front-end-libraries-projects/build-a-pomodoro-clock)
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+## Requirements
+    1. User can start timer
+    2. User can stop timer
+    3. User can choose timer, short break, or long break
+    4. User can see progress bar
+    5. User can see seconds count down
+    6. User can set number of minutes for each type of timer
+    7. Optional: add tasks at the bottom
+    8. Optional: dark theme and light theme
+    
+## Technology stack
+    * Vue.js
+    * Vuetify
+    * Sass
+    * Vue CLI
 
-### Compiles and minifies for production
-```
-yarn build
-```
 
-### Lints and fixes files
+## Project commands
 ```
-yarn lint
+yarn install -- Project setup
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+```
+yarn serve -- Compiles and hot-reloads for development
+```
+```
+yarn build  -- Compiles and minifies for production
+```
+```
+yarn lint -- Lints and fixes files
+```
