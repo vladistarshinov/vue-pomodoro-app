@@ -1,6 +1,10 @@
 <template>
     <v-card class="mt-8">
-        <v-tabs @change="changeTimer" v-model="currentTimer" grow>
+        <v-tabs 
+            @change="changeTimer" 
+            v-model="currentTimer" 
+            grow
+        >
             <v-tab
                 v-for="timer in timers"
                 :key="timer.title"
@@ -8,7 +12,6 @@
             {{ timer.title }}
             </v-tab>
         </v-tabs>
-
         <v-card
             class="pa-5 d-flex flex-column justify-center align-center"
             color="basil"
@@ -28,19 +31,57 @@
                     <v-icon left small >mdi-restart</v-icon>
                     Reset
                 </v-btn>
-                <v-btn @click="reset(timers[currentTimer].minutesCount)" v-else :disabled="isRunning">
+                <v-btn @click="reset(this.timers[currentTimer].minutesCount)" v-else :disabled="isRunning">
                     <v-icon left small >mdi-restart</v-icon>
                     Reset
                 </v-btn>
             </v-row>
+            <v-row class="wrapper d-flex justify-center">
+                <v-chip
+                    class="ma-2"
+                    color="green"
+                    text-color="white"
+                >
+                    <v-avatar
+                        left
+                        class="green darken-2"
+                    >
+                    {{countCycles}}
+                    </v-avatar>
+                    Work cycles
+                </v-chip>
+            </v-row>
         </v-card>
+
+        <Settings 
+            :modal="modal" 
+            :closeModal="closeModal" 
+            :saveSettings="saveSettings" 
+            :timers="timers"
+        />
     </v-card>
 </template>
 
 <script>
+import Settings from './Settings'
 export default {
+    components: {
+        Settings 
+    },
+    props: {
+        modal: {
+            type: Boolean,
+            required: true
+        },
+        closeModal: {
+            type: Function,
+            required: true
+        }
+    },
     data(){
         return {
+            countStartPush: 0,
+            countCycles: 0, 
             isRunning: false,
             timerInstance: null,
             totalSeconds: 25 * 60,
@@ -58,7 +99,7 @@ export default {
                     title: 'Long Break',
                     minutesCount: 10
                 }
-            ] 
+            ]
         }
     },
     computed: {
@@ -74,16 +115,41 @@ export default {
             this.stop()
             this.isRunning = true
             this.timerInstance = setInterval(() => {
-                this.totalSeconds -= 1
-            }, 1000)
+                if (this.totalSeconds <= 0) {
+                    this.stop() 
+                    this.countStartPush++
+                    if (this.countStartPush % 2 == 0 && this.countStartPush !== 0) {
+                        this.countCycles++
+                    }
+                    this.selectTimer()
+                    return
+                }
+                this.totalSeconds--
+            }, 1000)  
         },
         stop(){
             this.isRunning = false
             clearInterval(this.timerInstance)
         },
-        reset(minutes){
+        reset(minutesCount){
             this.stop()
-            this.totalSeconds = minutes * 60
+            this.totalSeconds = minutesCount * 60
+        },
+        selectTimer(){
+            if (this.countStartPush == 8) {
+                this.changeTimer(this.currentTimer + 1)
+                this.countStartPush = -1
+            }
+            else {
+                if (this.currentTimer == 0)
+                    this.changeTimer(this.currentTimer + 1)
+                else if (this.currentTimer == 1)
+                    this.changeTimer(this.currentTimer - 1)
+                else 
+                    this.changeTimer(this.currentTimer - 2)
+            }            
+            this.start()
+            return
         },
         formatTime(time){
              if (time < 10) {
@@ -94,7 +160,12 @@ export default {
         changeTimer(number) {
             this.currentTimer = number
             this.reset(this.timers[number].minutesCount)
-            console.log(this.timers[number].minutesCount)
+        },
+        saveSettings(updateTimers){
+            this.timers = this.timers.map((timer, index) => {
+                return {...timer, minutesCount: parseInt(updateTimers[index].minutesCount)}
+            })
+            this.closeModal()
         }
     }
 }
